@@ -255,3 +255,22 @@ Trang **Cài đặt** chỉ sửa trên form. Bấm **Lưu** mới ghi vào `dat
 - [x] **GĐ3**: Import Excel (file mẫu 3 sheet có dropdown dữ liệu thật, kiểm tra theo dòng, nạp vào lưới)
 - [x] **GĐ4**: Worklog / Timesheet (lưới issue × ngày, tổng, cảnh báo thiếu/vượt giờ, quy tắc log work, log nhanh, xuất Excel)
 - [x] **GĐ5**: Settings đầy đủ (map field, giờ làm việc, ngày nghỉ, múi giờ, mặc định khi tạo issue) + chuyển trạng thái issue
+
+## Deploy lên Vercel
+
+Repo đã có sẵn `vercel.json` + `api/index.js`: client build ra `client/dist` (static), API chạy dạng Serverless Function.
+
+1. Vercel → **Add New → Project** → import repo GitHub này (Framework Preset: **Other**; các lệnh build đã khai báo trong `vercel.json`).
+2. **Environment Variables**:
+   | Biến | Giá trị |
+   |---|---|
+   | `JIRA_BASE_URL` | VD `https://your-site.atlassian.net` |
+   | `SESSION_SECRET` | chuỗi ngẫu nhiên ≥ 32 ký tự — **bắt buộc** (session lưu trong cookie mã hoá AES-GCM) |
+   | `SETTINGS_JSON` | (tuỳ chọn) nội dung `data/settings.json` — settings ban đầu |
+   | `JIRA_ALLOWED_HOSTS`, `SESSION_IDLE_MINUTES` | (tuỳ chọn) như khi chạy local |
+3. Deploy. Mỗi lần push lên nhánh `main` Vercel tự build lại.
+
+Lưu ý khi chạy trên Vercel:
+- Jira phải truy cập được từ Internet (Jira Cloud OK; Jira nội bộ thì không).
+- Settings sửa trên giao diện chỉ lưu ở `/tmp` của instance → có thể mất khi Vercel khởi động instance mới. Muốn giữ lâu dài, cập nhật `SETTINGS_JSON` rồi redeploy.
+- Đăng xuất chỉ xoá cookie ở trình duyệt; đổi `SESSION_SECRET` để vô hiệu hoá mọi phiên đã cấp.

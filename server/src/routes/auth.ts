@@ -93,7 +93,7 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
         deploymentType: info.deploymentType,
         serverVersion: info.version,
       });
-      reply.setCookie(SESSION_COOKIE, sess.id, {
+      reply.setCookie(SESSION_COOKIE, sessions.cookieValue(sess), {
         ...cookieOptions(),
         maxAge: config.sessionIdleMinutes * 60,
       });

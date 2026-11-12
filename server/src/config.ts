@@ -48,8 +48,16 @@ export const config = {
   jiraBaseUrl: base.toString().replace(/\/$/, ''),
   allowedHosts: parseHosts(process.env.JIRA_ALLOWED_HOSTS, base.host),
   sessionIdleMinutes: Number(process.env.SESSION_IDLE_MINUTES || 480),
-  cookieSecure: process.env.COOKIE_SECURE === 'true',
-  dataDir: process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : path.join(root, 'data'),
+  // Vercel luôn chạy HTTPS → mặc định bật Secure
+  cookieSecure: process.env.COOKIE_SECURE ? process.env.COOKIE_SECURE === 'true' : !!process.env.VERCEL,
+  /** Có giá trị → session lưu trong cookie mã hoá (bắt buộc khi chạy serverless như Vercel) */
+  sessionSecret: process.env.SESSION_SECRET || '',
+  // Trên Vercel chỉ /tmp ghi được (và không bền) → settings ban đầu nên đặt qua SETTINGS_JSON
+  dataDir: process.env.DATA_DIR
+    ? path.resolve(process.env.DATA_DIR)
+    : process.env.VERCEL
+      ? '/tmp/jpw-data'
+      : path.join(root, 'data'),
   clientDist: path.join(root, 'client', 'dist'),
   isProd: process.env.NODE_ENV === 'production',
   cacheTtlMs: 10 * 60 * 1000,

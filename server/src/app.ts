@@ -10,8 +10,8 @@ import { MyIssuesService } from './jira/my-issues.service';
 import { TimesheetService } from './jira/timesheet.service';
 import { MetaService } from './jira/meta.service';
 import { TtlCache } from './lib/cache';
-import { SessionStore, type Session } from './session/store';
-import { cookieOptions, SESSION_COOKIE } from './session/cookie';
+import { CookieSessionStore, SessionStore, type Session, type SessionBackend } from './session/store';
+import { cookieOptions, SESSION_COOKIE, writeSessionCookie } from './session/cookie';
 import { SettingsStore } from './settings/store';
 import { authRoutes } from './routes/auth';
 import { contextRoutes } from './routes/context';
@@ -25,7 +25,7 @@ import { sourceRoutes } from './routes/sources';
 import { transitionRoutes } from './routes/transitions';
 
 export interface AppDeps {
-  sessions: SessionStore;
+  sessions: SessionBackend;
   settings: SettingsStore;
   meta: MetaService;
   issues: IssueService;
@@ -66,7 +66,11 @@ export async function buildApp(overrides: Partial<AppDeps> = {}): Promise<Fastif
   });
 
   const deps: AppDeps = {
-    sessions: overrides.sessions ?? new SessionStore(config.sessionIdleMinutes),
+    sessions:
+      overrides.sessions ??
+      (config.sessionSecret
+        ? new CookieSessionStore(config.sessionSecret, config.sessionIdleMinutes)
+        : new SessionStore(config.sessionIdleMinutes)),
     settings: overrides.settings ?? new SettingsStore(config.dataDir),
     meta: overrides.meta ?? new MetaService(new TtlCache(config.cacheTtlMs)),
     issues: overrides.issues ?? new IssueService(),
@@ -86,6 +90,8 @@ export async function buildApp(overrides: Partial<AppDeps> = {}): Promise<Fastif
     }
     req.sess = sess;
     req.jira = new JiraClient(sess.baseUrl, sess.authHeader, deps.allowedHosts);
+    // Cookie store: gia hạn phiên (lastSeen) bằng cách ghi lại cookie
+    if (deps.sessions.stateless) writeSessionCookie(deps.sessions, req, reply);
   });
 
   app.addHook('onSend', async (req, reply) => {

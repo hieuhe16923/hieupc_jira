@@ -1,6 +1,8 @@
 import { randomBytes } from 'node:crypto';
 import type { DeploymentType, JiraUser, SourceEntry } from '@jpw/shared';
 
+export { CookieSessionStore } from './cookie-store';
+
 export interface Session {
   id: string;
   /** Header Authorization đã dựng sẵn — KHÔNG bao giờ trả ra client hoặc ghi log */
@@ -13,10 +15,29 @@ export interface Session {
   lastSeen: number;
   /** Issue gốc đã xác nhận (cache theo phiên đăng nhập, mất khi đăng xuất) */
   sources?: SourceEntry[];
+  /**
+   * Issue gốc chỉ còn key (khôi phục từ cookie trên instance serverless chưa có cache) —
+   * route /sources sẽ đọc lại từ Jira rồi chuyển vào `sources`.
+   */
+  pendingSources?: { key: string; input: string; addedAt: number }[];
+}
+
+export type SessionData = Omit<Session, 'id' | 'createdAt' | 'lastSeen'>;
+
+/** Nơi lưu session: RAM (chạy local / Docker) hoặc cookie mã hoá (serverless, VD Vercel) */
+export interface SessionBackend {
+  /** true = trạng thái nằm trong cookie, phải ghi lại cookie mỗi khi session thay đổi */
+  readonly stateless: boolean;
+  create(data: SessionData): Session;
+  get(token: string | undefined): Session | undefined;
+  destroy(token: string | undefined): void;
+  /** Giá trị đặt vào cookie cho session này */
+  cookieValue(s: Session): string;
 }
 
 /** Session chỉ nằm trong RAM của server. Restart = phải đăng nhập lại. */
-export class SessionStore {
+export class SessionStore implements SessionBackend {
+  readonly stateless = false;
   private readonly sessions = new Map<string, Session>();
   private readonly idleMs: number;
 
@@ -25,7 +46,11 @@ export class SessionStore {
     setInterval(() => this.sweep(), 60_000).unref();
   }
 
-  create(data: Omit<Session, 'id' | 'createdAt' | 'lastSeen'>): Session {
+  cookieValue(s: Session): string {
+    return s.id;
+  }
+
+  create(data: SessionData): Session {
     const now = Date.now();
     const session: Session = {
       ...data,

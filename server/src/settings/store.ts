@@ -18,6 +18,16 @@ export class SettingsStore {
       this.cached = mergeSettings(DEFAULT_SETTINGS, raw);
     } catch {
       this.cached = structuredClone(DEFAULT_SETTINGS);
+      // Chưa có file (VD instance serverless mới) → dùng settings ban đầu từ biến môi trường
+      if (process.env.SETTINGS_JSON) {
+        try {
+          this.cached = validateSettings(
+            mergeSettings(DEFAULT_SETTINGS, JSON.parse(process.env.SETTINGS_JSON) as unknown),
+          );
+        } catch {
+          // SETTINGS_JSON sai định dạng → giữ mặc định
+        }
+      }
     }
     return this.cached;
   }
