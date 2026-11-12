@@ -1,0 +1,150 @@
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+}
+
+.login-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 16px !important;
+}
+
+.app-content {
+  padding: 16px;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+@media (max-width: 576px) {
+  .hide-xs {
+    display: none !important;
+  }
+}
+
+.row-done > td {
+  opacity: 0.75;
+}
+
+.row-error > td:first-child {
+  box-shadow: inset 3px 0 0 #ff4d4f;
+}
+
+/* Tag label kiểu Jira: nền trung tính, viền màu theo tên label */
+.jira-label {
+  background: transparent;
+  border-width: 1px;
+  border-radius: 3px;
+  font-size: 12px;
+  line-height: 18px;
+  padding-inline: 4px;
+}
+
+/* Dòng đã sửa, chưa lưu */
+.row-dirty > td:first-child {
+  box-shadow: inset 3px 0 0 #faad14;
+}
+
+/* Lưới log theo ngày: tô mờ T7/CN */
+.cell-weekend {
+  background: rgba(127, 127, 127, 0.08);
+}
+.daily-worklog .ant-table-cell {
+  padding: 4px !important;
+}
+
+/* Timesheet */
+.timesheet .ts-cell {
+  padding: 0 !important;
+}
+.timesheet .ts-click {
+  cursor: pointer;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.timesheet .ts-click:hover {
+  background: rgba(22, 119, 255, 0.12);
+}
+.timesheet .ts-empty {
+  opacity: 0;
+}
+.timesheet .ts-click:hover .ts-empty {
+  opacity: 0.5;
+}
+.timesheet .ts-today {
+  box-shadow: inset 0 0 0 1px rgba(22, 119, 255, 0.5);
+}
+.timesheet .ts-short {
+  background: rgba(255, 77, 79, 0.18) !important;
+}
+.timesheet .ts-over {
+  background: rgba(250, 173, 20, 0.2) !important;
+}
+
+/* Dock worklog dưới đáy trang tạo issue */
+.worklog-dock {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  margin: 16px -16px -16px;
+  border-radius: 8px 8px 0 0;
+}
+.worklog-dock-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  user-select: none;
+}
+.worklog-dock-body {
+  max-height: 55vh;
+  overflow: auto;
+  padding: 0 16px 12px;
+}
+@media (max-width: 768px) {
+  .worklog-dock {
+    margin: 12px -12px -12px;
+  }
+}
+
+/* Thanh tiêu đề trang Cài đặt: dính trên cùng khi cuộn */
+.settings-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+}

@@ -1,0 +1,14 @@
+services:
+  workbench:
+    build: .
+    image: jira-personal-workbench:latest
+    env_file: .env
+    environment:
+      HOST: 0.0.0.0
+      API_PORT: 3001
+      DATA_DIR: /app/data
+    ports:
+      - '127.0.0.1:3001:3001'
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
