@@ -264,8 +264,8 @@ Repo đã có sẵn `vercel.json` + `api/index.js`: client build ra `client/dist
 2. **Environment Variables**:
    | Biến | Giá trị |
    |---|---|
-   | `JIRA_BASE_URL` | VD `https://your-site.atlassian.net` |
-   | `SESSION_SECRET` | chuỗi ngẫu nhiên ≥ 32 ký tự — **bắt buộc** (session lưu trong cookie mã hoá AES-GCM) |
+   | `JIRA_BASE_URL` | (tuỳ chọn) mặc định `https://bidv-vn.atlassian.net` |
+   | `SESSION_SECRET` | **nên đặt**: chuỗi ngẫu nhiên ≥ 32 ký tự (khoá mã hoá cookie session AES-GCM). Không đặt thì app vẫn chạy nhưng dùng khoá dự phòng dẫn xuất từ ID project — kém an toàn hơn |
    | `SETTINGS_JSON` | (tuỳ chọn) nội dung `data/settings.json` — settings ban đầu |
    | `JIRA_ALLOWED_HOSTS`, `SESSION_IDLE_MINUTES` | (tuỳ chọn) như khi chạy local |
 3. Deploy. Mỗi lần push lên nhánh `main` Vercel tự build lại.
